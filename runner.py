@@ -15,9 +15,9 @@ selects pre_training function and filename according to mode chosen
 """
 def select_mode (mode):
     if mode == 0:
-        return (pretraining.full_pre_training, 'comparison')
+        return (pretraining.full_prep, 'comparison')
     else:
-        return (pretraining.partial_pre_training, 'partial')
+        return (pretraining.partial_prep, 'partial')
 
 """
 implementation of the main loop of the experiment
@@ -30,31 +30,34 @@ def run_experiment (fwdp, nsamples, nreps, mode):
     filename = f'./data/{mode_name}{fwdp}'
     timestart = time.perf_counter ()
 
+    X, Y, val_x, val_y, input_shape, nclasses = utils.load_data ()
+
     for i in range (nreps):
         print (f'repetition: {i}')
 
         ## pre-training phase
         base_models, uncertain_models, ensembles = mode_fn (fwdp)
-        base_models = [transfer.make_point_extractor (m) for m in base_models]
-        uncertain_models = [transfer.make_uncertain_extractor (m) for m in uncertain_models]
-        ensembles = [transfer.make_ensemble_extractor (m) for m in ensembles]
 
         ## Base models
         for m in base_models:
-            m.summary ()
+            m = pretraining.train_model (m, X, Y, val_x, val_y)
+            m = transfer.make_point_extractor (m)
             acc, cerr, _ = transfer.eval_tl (m, samples=nsamples)
             write_csv ([m.name, acc, cerr], filename)
 
         keras.backend.clear_session ()
         ## BNN
         for m in uncertain_models:
-            m.model.summary ()
+            m = pretraining.train_model (m, X, Y, val_x, val_y)
+            m = transfer.make_uncertain_extractor (m)
             acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
             write_csv ([m.model.name, acc, cerr], filename)
 
         keras.backend.clear_session ()
         ## ensembles
         for m in ensembles:
+            m = pretraining.train_model (m, X, Y, val_x, val_y)
+            m = transfer.make_ensemble_extractor (m)
             acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
             write_csv ([f'ens_{m.name}', acc, cerr], filename)
 

@@ -51,17 +51,3 @@ def build_mlp (input_shape, nclasses):
                   optimizer='adam',
                   metrics=['accuracy'])
     return model
-
-'''
-train and return a model
-'''
-def train_model (model, X, Y, val_x, val_y):
-
-    earlystopping_cb = keras.callbacks.EarlyStopping(monitor='val_loss',
-                                                     verbose=1,
-                                                     patience=3)
-    model.fit (X, Y,
-               epochs = 60,
-               callbacks = [earlystopping_cb],
-               validation_data = [val_x, val_y],)
-    return model
