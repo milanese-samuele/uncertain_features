@@ -45,9 +45,9 @@ def full_prep (n_ens):
     #                                                    x_train, y_train,
     #                                                    x_test, y_test,)
 
-    archs = [train_fn (m) for m in archs]
-    uncertain_models = [train_fn (m) for m in uncertain_models]
-    ensembles = [train_fn (e) for e in ensembles]
+    # archs = [train_fn (m) for m in archs]
+    # uncertain_models = [train_fn (m) for m in uncertain_models]
+    # ensembles = [train_fn (e) for e in ensembles]
     return archs, uncertain_models, ensembles
 
 """
@@ -71,6 +71,6 @@ def partial_prep (_):
     #                                                    x_train, y_train,
     #                                                    x_test, y_test,)
 
-    archs = [train_fn (m) for m in archs]
-    uncertain_models = [train_fn (m) for m in uncertain_models]
+    # archs = [train_fn (m) for m in archs]
+    # uncertain_models = [train_fn (m) for m in uncertain_models]
     return archs, uncertain_models, []
