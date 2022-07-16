@@ -36,7 +36,7 @@ def run_experiment (fwdp, nsamples, nreps, mode):
         print (f'repetition: {i}')
 
         ## pre-training phase
-        base_models, uncertain_models, ensembles = mode_fn (fwdp)
+        base_models, uncertain_models, ensembles = mode_fn (fwdp/2) ## ensembles half the number of forward passes
 
         ## Base models
         for m in base_models:
