@@ -27,7 +27,7 @@ def run_experiment (fwdp, nsamples, nreps, mode):
 
     ## initializations
     mode_fn, mode_name = select_mode (mode)
-    filename = f'./data/{mode_name}{fwdp}'
+    filename = f'./data/{mode_name}{fwdp}.csv'
     timestart = time.perf_counter ()
 
     X, Y, val_x, val_y, input_shape, nclasses = utils.load_data ()
