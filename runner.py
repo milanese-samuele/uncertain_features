@@ -36,7 +36,7 @@ def run_experiment (fwdp, nsamples, nreps, mode):
         print (f'repetition: {i}')
 
         ## pre-training phase
-        base_models, uncertain_models, ensembles = mode_fn (fwdp/2) ## ensembles half the number of forward passes
+        base_models, uncertain_models, ensembles = mode_fn (fwdp//2) ## ensembles half the number of forward passes
 
         ## Base models
         for m in base_models:
@@ -59,7 +59,7 @@ def run_experiment (fwdp, nsamples, nreps, mode):
             m = pretraining.train_model (m, X, Y, val_x, val_y)
             m = transfer.make_ensemble_extractor (m)
             acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
-            write_csv ([f'ens_{m.name}', acc, cerr], filename)
+            write_csv ([f'ens_{m.test_estimators[0].name}', acc, cerr], filename)
 
             keras.backend.clear_session ()
         print (f'repetition {i} took {time.perf_counter() - timestart:0.4f} seconds')

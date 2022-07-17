@@ -37,6 +37,8 @@ def reduce_dims (train_feats, test_feats, var = 0.95):
     pca.fit (train_feats)
     train_feats = pca.transform (train_feats)
     test_feats = pca.transform (test_feats)
+    del scaler
+    del pca
     return train_feats, test_feats
 
 def eval_tl (extractor, fwd_passes = None, samples = 5000, aug_test = None):
@@ -61,6 +63,7 @@ def eval_tl (extractor, fwd_passes = None, samples = 5000, aug_test = None):
     preds = clf.predict_proba (test_feats)
     acc = utils.score (preds, domain)
     cerr, cplot = utils.calib_error (preds, domain)
+    del clf
     return acc, cerr, cplot
 
 def sampling_tl (extractor, fwd_passes = None, samples = 5000, aug_reps = None):
