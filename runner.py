@@ -44,7 +44,7 @@ def run_experiment (fwdp, nsamples, nreps, mode):
             m = pretraining.train_model (m, X, Y, val_x, val_y)
             m = transfer.make_ensemble_extractor (m)
             acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
-            write_csv ([f'ens_{m.test_estimators[0].name}', acc, cerr], filename)
+            write_csv ([f'ens_{m.test_estimators[0].model.name}', acc, cerr], filename)
 
             keras.backend.clear_session ()
 
