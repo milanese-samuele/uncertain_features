@@ -35,19 +35,6 @@ def run_experiment (fwdp, nsamples, nreps, mode):
         ## pre-training phase
         base_models, uncertain_models, ensembles = mode_fn (fwdp//2) ## ensembles half the number of forward passes
 
-        ## ensembles
-        for m in ensembles:
-            print("ensembles")
-            m = pretraining.train_model (m, X, Y, val_x, val_y)
-            m = transfer.make_ensemble_extractor (m)
-            if mode == 2:
-                acc, cerr, _ = transfer.sampling_tl (m, fwd_passes=fwdp, samples=nsamples, aug_reps=AUG)
-            else:
-                acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
-            write_csv ([f'ens_{m.test_estimators[0].model.name}', acc, cerr], filename)
-
-            keras.backend.clear_session ()
-
         ## Base models
         for m in base_models:
             print("base models")
@@ -72,6 +59,19 @@ def run_experiment (fwdp, nsamples, nreps, mode):
             write_csv ([m.model.name, acc, cerr], filename)
 
             keras.backend.clear_session ()
+        ## ensembles
+        for m in ensembles:
+            print("ensembles")
+            m = pretraining.train_model (m, X, Y, val_x, val_y)
+            m = transfer.make_ensemble_extractor (m)
+            if mode == 2:
+                acc, cerr, _ = transfer.sampling_tl (m, fwd_passes=fwdp, samples=nsamples, aug_reps=AUG)
+            else:
+                acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
+            write_csv ([f'ens_{m.test_estimators[0].model.name}', acc, cerr], filename)
+
+            keras.backend.clear_session ()
+
         print (f'repetition {i} took {time.perf_counter() - timestart:0.4f} seconds')
 
     print ("Experiment completed!")
