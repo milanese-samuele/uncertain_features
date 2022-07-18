@@ -10,23 +10,20 @@ import utils
 import transfer
 import pretraining
 
-"""
-selects pre_training function and filename according to mode chosen
-"""
-def select_mode (mode):
-    if mode == 0:
-        return (pretraining.full_prep, 'comparison')
-    else:
-        return (pretraining.partial_prep, 'partial')
+pretraining_mode = [(pretraining.full_prep, "comparison"), # mode 0 = uq comparison
+                    (pretraining.partial_prep, "partial"), # mode 1 = partial uq
+                    (pretraining.full_prep, "sampling")] # mode 2 sampling
+
 
 """
 implementation of the main loop of the experiment
 """
 def run_experiment (fwdp, nsamples, nreps, mode):
     import csv
+    AUG = 10 # data augmentation factor
 
     ## initializations
-    mode_fn, mode_name = select_mode (mode)
+    mode_fn, mode_name = pretraining_mode [mode]
     filename = f'./data/{mode_name}{fwdp}.csv'
     timestart = time.perf_counter ()
 
@@ -43,7 +40,10 @@ def run_experiment (fwdp, nsamples, nreps, mode):
             print("ensembles")
             m = pretraining.train_model (m, X, Y, val_x, val_y)
             m = transfer.make_ensemble_extractor (m)
-            acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
+            if mode == 2:
+                acc, cerr, _ = transfer.sampling_tl (m, fwd_passes=fwdp, samples=nsamples, aug_reps=AUG)
+            else:
+                acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
             write_csv ([f'ens_{m.test_estimators[0].model.name}', acc, cerr], filename)
 
             keras.backend.clear_session ()
@@ -53,7 +53,10 @@ def run_experiment (fwdp, nsamples, nreps, mode):
             print("base models")
             m = pretraining.train_model (m, X, Y, val_x, val_y)
             m = transfer.make_point_extractor (m)
-            acc, cerr, _ = transfer.eval_tl (m, samples=nsamples)
+            if mode == 2:
+                acc, cerr, _ = transfer.eval_tl (m, samples=nsamples, aug_test=AUG)
+            else:
+                acc, cerr, _ = transfer.eval_tl (m, samples=nsamples)
             write_csv ([m.name, acc, cerr], filename)
 
             keras.backend.clear_session ()
@@ -62,7 +65,10 @@ def run_experiment (fwdp, nsamples, nreps, mode):
             print("uncertain models")
             m = pretraining.train_model (m, X, Y, val_x, val_y)
             m = transfer.make_uncertain_extractor (m)
-            acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
+            if mode == 2:
+                acc, cerr, _ = transfer.sampling_tl (m, fwd_passes=fwdp, samples=nsamples, aug_reps=AUG)
+            else:
+                acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
             write_csv ([m.model.name, acc, cerr], filename)
 
             keras.backend.clear_session ()
