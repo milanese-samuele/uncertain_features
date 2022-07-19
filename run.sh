@@ -1,6 +1,5 @@
 #!/bin/bash
-for i in {1..5}
+for i in {1..20}
 do
-  python runner.py configs/comparison100.ini
-  python runner.py configs/partial100.ini
+  python runner.py configs/sampling.ini
 done
