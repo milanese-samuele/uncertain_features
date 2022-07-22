@@ -6,6 +6,7 @@ import keras_uncertainty
 import keras
 
 import utils
+import pretraining
 
 """
 discards last layer (s) to make a feature extractor
@@ -99,4 +100,36 @@ def sampling_tl (extractor, fwd_passes = None, samples = 5000, aug_reps = None):
     preds = clf.predict_proba (test_feats)
     acc = utils.score (preds, domain)
     cerr, cplot = utils.calib_error (preds, domain)
+    return acc, cerr, cplot
+
+def transfer_network (extractor, fwd_passes = None):
+    ## load data
+    X, Y, val_x, val_y, _, nclasses = utils.load_fashion_data ()
+
+    ## creating features based on extractor
+    if extractor.__class__ is keras_uncertainty.models.DeepEnsembleRegressor:
+        get_features = lambda X : extractor.predict (X) [0]
+    elif fwd_passes is None :
+        get_features = lambda X : extractor.predict (X)
+    else:
+        get_features = lambda X : extractor.predict (X, fwd_passes) [0]
+
+    X = get_features (X)
+    val_x = get_features (val_x)
+
+    input_shape = X[1].shape
+
+    # create target network
+    inputs = keras.Input (shape=input_shape)
+    outputs = keras.layers.Dense (nclasses, activation='softmax') (inputs)
+    model = keras.Model (inputs, outputs)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam',
+                  metrics=['accuracy'])
+    print ("fitting target model")
+    model = pretraining.train_model (model, X, Y, val_x, val_y)
+    # scoring
+    preds = model.predict (val_x)
+    acc = utils.score (preds, val_y)
+    cerr, cplot = utils.calib_error (preds, val_y)
     return acc, cerr, cplot
