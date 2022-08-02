@@ -1,0 +1,10 @@
+convnet_extractor,0.8854,0.00856296775937085
+simple_mlp_extractor,0.8467,0.018747769746184348
+convnet_extractor,0.8813,0.012029731982946362
+simple_mlp_extractor,0.8468,0.0157383372783661
+mc_dropconnect_convnet_extractor,0.8761,0.021010309743881184
+mc_dropout_convnet_extractor,0.8725,0.01760451596826318
+mc_dropconnect_simple_mlp_extractor,0.8311,0.029826277762651426
+mc_dropout_simple_mlp_extractor,0.8328,0.028926682183146472
+ens_convnet_extractor,0.8886,0.008959994053840653
+ens_simple_mlp_extractor,0.8416,0.015597781160473815

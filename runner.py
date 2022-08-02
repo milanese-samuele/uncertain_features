@@ -24,7 +24,7 @@ def run_experiment (fwdp, nsamples, nreps, mode, target_model):
 
     ## initializations
     mode_fn, mode_name = pretraining_mode [mode]
-    filename = f'./data/{mode_name}{fwdp}.csv'
+    filename = f'./data/{mode_name}{fwdp}{target_model}.csv'
     timestart = time.perf_counter ()
 
 
@@ -62,7 +62,7 @@ def run_experiment (fwdp, nsamples, nreps, mode, target_model):
                 if target_model == 'svm':
                     acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
                 else :
-                    acc, cerr, _ = transfer.transfer_network (m, fwp)
+                    acc, cerr, _ = transfer.transfer_network (m, fwdp)
             write_csv ([m.model.name, acc, cerr], filename)
 
             keras.backend.clear_session ()
@@ -77,7 +77,7 @@ def run_experiment (fwdp, nsamples, nreps, mode, target_model):
                 if target_model == 'svm':
                     acc, cerr, _ = transfer.eval_tl (m, fwd_passes = fwdp, samples=nsamples)
                 else :
-                    acc, cerr, _ = transfer.transfer_network (m, fwp)
+                    acc, cerr, _ = transfer.transfer_network (m, fwdp)
             write_csv ([f'ens_{m.test_estimators[0].model.name}', acc, cerr], filename)
 
             keras.backend.clear_session ()

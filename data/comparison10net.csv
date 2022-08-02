@@ -1,0 +1,4 @@
+convnet_extractor,0.8834,0.012882824505865541
+simple_mlp_extractor,0.8436,0.018984375897049884
+mc_dropconnect_convnet_extractor,0.8795,0.011887627741694454
+mc_dropout_convnet_extractor,0.8806,0.016334976559877406
