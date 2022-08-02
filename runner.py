@@ -9,6 +9,7 @@ import time
 import utils
 import transfer
 import pretraining
+import datavis
 
 pretraining_mode = [(pretraining.full_prep, "comparison"), # mode 0 = uq comparison
                     (pretraining.partial_prep, "partial"), # mode 1 = partial uq
@@ -19,7 +20,6 @@ pretraining_mode = [(pretraining.full_prep, "comparison"), # mode 0 = uq compari
 implementation of the main loop of the experiment
 """
 def run_experiment (fwdp, nsamples, nreps, mode, target_model):
-    import csv
     AUG = 10 # data augmentation factor
 
     ## initializations
@@ -86,6 +86,32 @@ def run_experiment (fwdp, nsamples, nreps, mode, target_model):
 
     print ("Experiment completed!")
 
+def data_visualization (fwdp=10):
+    base_models, uncertain_models, ensembles = pretraining.full_prep (fwdp//2) ## ensembles half the number of forward passes
+    X, Y, val_x, val_y, input_shape, nclasses = utils.load_data ()
+        ## Base models
+    for m in base_models:
+        print("base models")
+        name = m.name
+        print (m.name)
+        # m = pretraining.train_model (m, X, Y, val_x, val_y)
+        m = transfer.make_point_extractor (m)
+
+        datavis.visualize_data (m, name = name)
+
+        keras.backend.clear_session ()
+    ## BNN
+    for m in uncertain_models:
+        print("uncertain models")
+        name = m.name
+        print (m.name)
+        # m = pretraining.train_model (m, X, Y, val_x, val_y)
+        m = transfer.make_uncertain_extractor (m)
+
+        datavis.visualize_data (m, fwdp, name = name)
+
+        keras.backend.clear_session ()
+
 """
 helper function that writes to csv file
 """
@@ -104,14 +130,17 @@ def read_config (filename):
 
 
 def main (argv):
-    exp_confs = read_config (argv [0])
-    fwd_passes = int (exp_confs ['experiment_settings'] ['fwd_passes'])
-    num_samples = int (exp_confs ['experiment_settings'] ['num_samples'])
-    num_samples = None if num_samples == 0 else num_samples
-    num_reps = int (exp_confs ['experiment_settings'] ['num_reps'])
-    mode =  int (exp_confs ['experiment_settings'] ['mode'])
-    target_model= str (exp_confs ['experiment_settings'] ['target_model'])
-    run_experiment (fwd_passes, num_samples, num_reps, mode, target_model)
+    if not argv:
+        data_visualization ()
+    else:
+        exp_confs = read_config (argv [0])
+        fwd_passes = int (exp_confs ['experiment_settings'] ['fwd_passes'])
+        num_samples = int (exp_confs ['experiment_settings'] ['num_samples'])
+        num_samples = None if num_samples == 0 else num_samples
+        num_reps = int (exp_confs ['experiment_settings'] ['num_reps'])
+        mode =  int (exp_confs ['experiment_settings'] ['mode'])
+        target_model= str (exp_confs ['experiment_settings'] ['target_model'])
+        run_experiment (fwd_passes, num_samples, num_reps, mode, target_model)
 
 if __name__ == '__main__':
     main (sys.argv [1:])
