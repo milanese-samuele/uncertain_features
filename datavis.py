@@ -14,6 +14,14 @@ import matplotlib.pyplot as plt
 import utils
 import keras_uncertainty
 
+def save_image (fig, name):
+    import os
+
+    if not os.path.exists("images"):
+        os.mkdir("images")
+
+    fig.write_image(f"images/PCA_{name}.png")
+
 
 def plot_2d(component1, component2, Y, name):
 
@@ -24,9 +32,10 @@ def plot_2d(component1, component2, Y, name):
         "mc_dropout_convnet" : "MC-Dropout ConvNet",
         "mc_dropconnect_simple_mlp" : "MC-DropConnect MLP",
         "mc_dropout_simple_mlp" : "MC-Dropout MLP",
-
+        "ens_convnet_extractor" : "ConvNet Deep-Ensemble",
+        "ens_simple_mlp_extractor" : "MLP Deep-Ensemble"
     }
-    name = translate_name [name]
+    title_name = translate_name [name]
     fig = go.Figure(data=go.Scatter(
         x = component1,
         y = component2,
@@ -40,7 +49,7 @@ def plot_2d(component1, component2, Y, name):
         ),
     ))
     fig.update_layout(margin=dict( l=100,r=100,b=100,t=100),width=2000,height=1200,
-                      title=f'PCA plot of features obtained by {name}, with class labels',
+                      title=f'PCA plot of features obtained by {title_name}, with class labels',
                       font=dict(
                           family="Courier New, monospace",
                           size=30,
@@ -49,6 +58,7 @@ def plot_2d(component1, component2, Y, name):
     fig.layout.template = 'ggplot2'
 
     fig.show()
+    save_image (fig, name)
 
 
 def pca_plot(x, Y, name):

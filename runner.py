@@ -94,7 +94,7 @@ def data_visualization (fwdp=10):
         print("base models")
         name = m.name
         print (m.name)
-        # m = pretraining.train_model (m, X, Y, val_x, val_y)
+        m = pretraining.train_model (m, X, Y, val_x, val_y)
         m = transfer.make_point_extractor (m)
 
         datavis.visualize_data (m, name = name)
@@ -105,11 +105,23 @@ def data_visualization (fwdp=10):
         print("uncertain models")
         name = m.name
         print (m.name)
-        # m = pretraining.train_model (m, X, Y, val_x, val_y)
+        m = pretraining.train_model (m, X, Y, val_x, val_y)
         m = transfer.make_uncertain_extractor (m)
 
         datavis.visualize_data (m, fwdp, name = name)
 
+        keras.backend.clear_session ()
+
+    ## ensembles
+    for m in ensembles:
+        print("ensembles")
+        m = pretraining.train_model (m, X, Y, val_x, val_y)
+        m = transfer.make_ensemble_extractor (m)
+
+        name = m.test_estimators [0].model.name
+        print (name)
+        name = f'ens_{name}'
+        datavis.visualize_data (m, fwdp, name = name)
         keras.backend.clear_session ()
 
 """
